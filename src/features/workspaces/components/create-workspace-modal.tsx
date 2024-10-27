@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 
 import { toast } from "sonner";
 
-import { useCreateWorkspace } from "../api/use-create-workspaces";
+import { useCreateWorkspace } from "../api/use-create-workspace";
 
 import { useCreateWorkspaceModal } from "../store/use-create-workspace-modal"
 
