@@ -8,10 +8,11 @@ import { PiTextAa } from "react-icons/pi";
 import { Delta, Op } from "quill/core";
 import Quill, { type QuillOptions } from "quill";
 
-import "quill/dist/quill.snow.css";
-
 import { Hint } from "./hint";
 import { Button } from "./ui/button";
+import { EmojiPopover } from "./emoji-popover";
+
+import "quill/dist/quill.snow.css";
 
 type EditorValue = {
     image: File | null;
@@ -79,7 +80,7 @@ const Editor = ({
                             handler: () => {
                                 // TODO: Submit form
                                 return;
-                            }
+                            },
                         },
                         shift_enter: {
                             key: "Enter",
@@ -87,10 +88,10 @@ const Editor = ({
                             handler: () => {
                                 quill.insertText(quill.getSelection()?.index || 0, "\n");
                             },
-                        }
-                    }
+                        },
+                    },
                 },
-            }
+            },
         };
 
         const quill = new Quill(editorContainer, options);
@@ -131,6 +132,12 @@ const Editor = ({
         };
     };
 
+    const onEmojiSelect = (emoji: any) => {
+        const quill = quillRef.current;
+
+        quill?.insertText(quill?.getSelection()?.index || 0, emoji.native);
+    };
+
     const isEmpty = text.replace(/<(.|\n)*?>/g, "").trim().length === 0;
 
 
@@ -144,11 +151,11 @@ const Editor = ({
                             <PiTextAa className="size-4" />
                         </Button>
                     </Hint>
-                    <Hint label="Emoji">
-                        <Button disabled={disabled} size="iconSm" variant="ghost" onClick={() => { }}>
+                    <EmojiPopover onEmojiSelect={onEmojiSelect}>
+                        <Button disabled={disabled} size="iconSm" variant="ghost">
                             <Smile className="size-4" />
                         </Button>
-                    </Hint>
+                    </EmojiPopover>
                     {variant === "create" && (
                         <Hint label="Image">
                             <Button disabled={disabled} size="iconSm" variant="ghost" onClick={() => { }}>
@@ -195,11 +202,16 @@ const Editor = ({
                     )}
                 </div>
             </div>
-            <div className="p-2 text-[10px] text-muted-foreground flex justify-end">
-                <p>
-                    <strong>Shift + Return</strong> to add new line
-                </p>
-            </div>
+            {variant === "create" && (
+                <div className={cn(
+                    "p-2 text-[10px] text-muted-foreground flex justify-end opacity-0 transition",
+                    !isEmpty && "opacity-100"
+                )}>
+                    <p>
+                        <strong>Shift + Return</strong> to add new line
+                    </p>
+                </div>
+            )}
         </div>
     );
 }
