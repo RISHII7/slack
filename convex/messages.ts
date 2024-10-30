@@ -6,7 +6,7 @@ import { auth } from "./auth";
 import { Doc, Id } from "./_generated/dataModel";
 import { QueryCtx, mutation, query } from "./_generated/server";
 
-const populateThread = async(ctx: QueryCtx, messageId: Id<"messages">) => {
+const populateThread = async (ctx: QueryCtx, messageId: Id<"messages">) => {
     const messages = await ctx.db
         .query("messages")
         .withIndex("by_parent_message_id", (q) => q.eq("parentMessageId", messageId))
@@ -69,7 +69,7 @@ export const get = query({
         channelId: v.optional(v.id("channels")),
         conversationId: v.optional(v.id("conversations")),
         parentMessageId: v.optional(v.id("messages")),
-        paginationOpts:paginationOptsValidator,
+        paginationOpts: paginationOptsValidator,
     },
     handler: async (ctx, args) => {
         const userId = await auth.getUserId(ctx);
@@ -92,14 +92,14 @@ export const get = query({
 
         const results = await ctx.db
             .query("messages")
-            .withIndex("by_channel_id_parent_message_id_conversation_id", (q) => 
-            q.eq("channelId", args.channelId)
-            .eq("parentMessageId", args.parentMessageId)
-            .eq("conversationId", _conversationId)
+            .withIndex("by_channel_id_parent_message_id_conversation_id", (q) =>
+                q.eq("channelId", args.channelId)
+                    .eq("parentMessageId", args.parentMessageId)
+                    .eq("conversationId", _conversationId),
             )
             .order("desc")
             .paginate(args.paginationOpts);
-        
+
         return {
             ...results,
             page: (
@@ -110,14 +110,14 @@ export const get = query({
 
                         if (!member || !user) {
                             return null;
-                        };
+                        }
 
                         const reactions = await populateReactions(ctx, message._id);
                         const thread = await populateThread(ctx, message._id);
                         const image = message.image
                             ? await ctx.storage.getUrl(message.image)
                             : undefined;
-                        
+
                         const reactionsWithCounts = reactions.map((reaction) => {
                             return {
                                 ...reaction,
@@ -136,7 +136,7 @@ export const get = query({
                                         new Set([...existingReaction.memberIds, reaction.memberId])
                                     );
                                 } else {
-                                    acc.push({...reaction, memberIds: [reaction.memberId]});
+                                    acc.push({ ...reaction, memberIds: [reaction.memberId] });
                                 }
 
                                 return acc;
@@ -164,7 +164,7 @@ export const get = query({
                     })
                 )
             ).filter(
-                (message) => message !== null
+                (message): message is NonNullable<typeof message> => message !== null,
             )
         };
     },
