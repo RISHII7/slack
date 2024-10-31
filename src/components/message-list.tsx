@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Loader } from "lucide-react";
 import { differenceInMinutes, format, isToday, isYesterday } from "date-fns";
 
 import { Id } from "../../convex/_generated/dataModel";
@@ -10,7 +11,7 @@ import { useCurrentMember } from "@/features/members/api/use-current-member";
 
 import { Message } from "./message";
 import { ChannelHero } from "./channel-hero";
-import { Loader } from "lucide-react";
+import { ConversationHero } from "./conversation-hero";
 
 const TIME_THRESHOLD = 5;
 
@@ -133,6 +134,18 @@ export const MessageList = ({
                     <Loader className="size-4 animate-spin" />
                 </span>
             </div>
+            )}
+            {variant === "channel" && channelName && channelCreationTime && (
+                <ChannelHero 
+                    name={channelName}
+                    creationTime={channelCreationTime}
+                />
+            )}
+            {variant === "conversation" && (
+                <ConversationHero
+                    name={memberName}
+                    image={memberImage} 
+                />
             )}
             {variant === "channel" && channelName && channelCreationTime && (
                 <ChannelHero 
